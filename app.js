@@ -1805,7 +1805,8 @@ function viewRecipeById(recipeId) {
 
 /* ---------- 6. INGREDIENTS ---------- */
 /* ----------    ├── addIngredient() ---------- */
-/* ----------    ├── setupIngredientAutocomplete() ---------- 
+/* ----------    ├── setupIngredientAutocomplete() ---------- */
+/* ----------    ├── setupEditIngredientAutocomplete() ---------- */
 /* ----------    ├── editIngredient() ---------- */
 /* ----------    ├── saveIngredient() ---------- */
 /* ----------    ├── saveEditedIngredient() ---------- */
@@ -2027,6 +2028,108 @@ function setupIngredientAutocomplete() {
         }
     );
 }
+function setupEditIngredientAutocomplete() {
+
+    const input =
+        document.getElementById("edit-ingredient-name");
+
+    const suggestions =
+        document.getElementById("edit-ingredient-suggestions");
+
+    if (!input || !suggestions) {
+        return;
+    }
+
+    const ingredients = getAllIngredients();
+
+    function showSuggestions() {
+
+        const search =
+            input.value
+                .trim()
+                .toLowerCase();
+
+        suggestions.innerHTML = "";
+
+        if (!search) {
+            suggestions.style.display = "none";
+            return;
+        }
+
+        const matches =
+            ingredients
+                .filter(ingredient =>
+                    ingredient.name
+                        .toLowerCase()
+                        .includes(search)
+                )
+                .slice(0, 10);
+
+        if (matches.length === 0) {
+            suggestions.style.display = "none";
+            return;
+        }
+
+        matches.forEach(ingredient => {
+
+            const item =
+                document.createElement("button");
+
+            item.type = "button";
+
+            item.className =
+                "ingredient-suggestion";
+
+            item.textContent =
+                ingredient.name;
+
+            item.addEventListener("click", () => {
+
+                input.value =
+                    ingredient.name;
+
+                suggestions.innerHTML = "";
+
+                suggestions.style.display = "none";
+
+                input.blur();
+
+            });
+
+            suggestions.appendChild(item);
+
+        });
+
+        suggestions.style.display = "block";
+    }
+
+    input.addEventListener(
+        "input",
+        showSuggestions
+    );
+
+    input.addEventListener(
+        "focus",
+        showSuggestions
+    );
+
+    document.addEventListener(
+        "click",
+        event => {
+
+            if (
+                !input.contains(event.target) &&
+                !suggestions.contains(event.target)
+            ) {
+
+                suggestions.style.display =
+                    "none";
+
+            }
+
+        }
+    );
+}
 function editIngredient(recipeIndex, ingredientIndex, fromEdit = false) {
 
     const recipe = recipes[recipeIndex];
@@ -2055,32 +2158,27 @@ function editIngredient(recipeIndex, ingredientIndex, fromEdit = false) {
 
         </div>
 
-
         <div class="form">
 
             <label>
                 Ingrediënt
 
-                <input
-                    id="edit-ingredient-name"
-                    list="ingredient-options"
-                    type="text"
-                    value="${ingredient.name}">
-                
-                <datalist id="ingredient-options">
+                <div class="autocomplete-container">
 
-                    ${
-                        getAllIngredients()
-                        .map(item => `
-                            <option value="${item.name}">
-                        `)
-                        .join("")
-                    }
+                    <input
+                        id="edit-ingredient-name"
+                        type="text"
+                        value="${ingredient.name}"
+                        autocomplete="off">
 
-                </datalist>
+                    <div
+                        id="edit-ingredient-suggestions"
+                        class="ingredient-suggestions">
+                    </div>
+
+                </div>
 
             </label>
-
 
             <label>
                 Hoeveelheid
@@ -2091,7 +2189,6 @@ function editIngredient(recipeIndex, ingredientIndex, fromEdit = false) {
                     step="0.01"
                     value="${ingredient.amount}">
             </label>
-
 
             <label>
                 Eenheid
@@ -2104,7 +2201,6 @@ function editIngredient(recipeIndex, ingredientIndex, fromEdit = false) {
 
             </label>
 
-
             <label>
                 Categorie
 
@@ -2115,7 +2211,6 @@ function editIngredient(recipeIndex, ingredientIndex, fromEdit = false) {
                 </select>
 
             </label>
-
 
             <label>
                 Opmerking
@@ -2128,7 +2223,6 @@ function editIngredient(recipeIndex, ingredientIndex, fromEdit = false) {
 
             </label>
 
-
             <button
                 class="primary-button"
                 onclick="saveEditedIngredient(${recipeIndex}, ${ingredientIndex}, ${fromEdit})">
@@ -2140,12 +2234,13 @@ function editIngredient(recipeIndex, ingredientIndex, fromEdit = false) {
         </div>
     `;
 
-
     document.getElementById("edit-ingredient-unit").value =
         ingredient.unit;
 
     document.getElementById("edit-ingredient-category").value =
         ingredient.category || "Overig";
+
+    setupEditIngredientAutocomplete();
 }
 function saveIngredient(recipeIndex, fromEdit = false) {
 
