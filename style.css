@@ -1409,3 +1409,42 @@ button:active {
     min-width: 44px;
     min-height: 44px;
 }
+.autocomplete-container {
+    position: relative;
+    width: 100%;
+}
+
+.ingredient-suggestions {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-top: 4px;
+    overflow: hidden;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.ingredient-suggestion {
+    display: block;
+    width: 100%;
+    padding: 12px 14px;
+    border: none;
+    border-bottom: 1px solid #eee;
+    background: white;
+    text-align: left;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.ingredient-suggestion:last-child {
+    border-bottom: none;
+}
+
+.ingredient-suggestion:active {
+    background: #eee;
+}

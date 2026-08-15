@@ -1805,6 +1805,7 @@ function viewRecipeById(recipeId) {
 
 /* ---------- 6. INGREDIENTS ---------- */
 /* ----------    ├── addIngredient() ---------- */
+/* ----------    ├── setupIngredientAutocomplete() ---------- 
 /* ----------    ├── editIngredient() ---------- */
 /* ----------    ├── saveIngredient() ---------- */
 /* ----------    ├── saveEditedIngredient() ---------- */
@@ -1836,28 +1837,26 @@ function addIngredient(recipeIndex, fromEdit = false) {
 
         </div>
 
-
         <div class="form">
 
             <label>
                 Ingrediënt
 
-                <input
-                    id="ingredient-name"
-                    list="ingredient-options"
-                    type="text"
-                    placeholder="Zoek ingrediënt..."
-                    onchange="updateIngredientDefaults()">
+                <div class="autocomplete-container">
 
-                <datalist id="ingredient-options">
+                    <input
+                        id="ingredient-name"
+                        type="text"
+                        placeholder="Zoek ingrediënt..."
+                        autocomplete="off">
 
-                    ${
-                        getAllIngredients().map(ingredient => `
-                            <option value="${ingredient.name}">
-                        `).join("")
-                    }
+                    <div
+                        id="ingredient-suggestions"
+                        class="ingredient-suggestions">
+                    </div>
 
-                </datalist>
+                </div>
+
                 <button
                     type="button"
                     class="secondary-button"
@@ -1869,7 +1868,6 @@ function addIngredient(recipeIndex, fromEdit = false) {
 
             </label>
 
-
             <label>
                 Hoeveelheid
 
@@ -1879,7 +1877,6 @@ function addIngredient(recipeIndex, fromEdit = false) {
                     step="0.01"
                     placeholder="Bijvoorbeeld 500">
             </label>
-
 
             <label>
                 Eenheid
@@ -1892,7 +1889,6 @@ function addIngredient(recipeIndex, fromEdit = false) {
 
             </label>
 
-
             <label>
                 Categorie
 
@@ -1904,7 +1900,6 @@ function addIngredient(recipeIndex, fromEdit = false) {
 
             </label>
 
-
             <label>
                 Opmerking
 
@@ -1914,7 +1909,6 @@ function addIngredient(recipeIndex, fromEdit = false) {
                     placeholder="Bijvoorbeeld fijngesneden">
 
             </label>
-
 
             <button
                 class="primary-button"
@@ -1926,6 +1920,112 @@ function addIngredient(recipeIndex, fromEdit = false) {
 
         </div>
     `;
+
+    setupIngredientAutocomplete();
+}
+function setupIngredientAutocomplete() {
+
+    const input =
+        document.getElementById("ingredient-name");
+
+    const suggestions =
+        document.getElementById("ingredient-suggestions");
+
+    if (!input || !suggestions) {
+        return;
+    }
+
+    const ingredients = getAllIngredients();
+
+    function showSuggestions() {
+
+        const search =
+            input.value
+                .trim()
+                .toLowerCase();
+
+        suggestions.innerHTML = "";
+
+        if (!search) {
+            suggestions.style.display = "none";
+            return;
+        }
+
+        const matches =
+            ingredients
+                .filter(ingredient =>
+                    ingredient.name
+                        .toLowerCase()
+                        .includes(search)
+                )
+                .slice(0, 10);
+
+        if (matches.length === 0) {
+            suggestions.style.display = "none";
+            return;
+        }
+
+        matches.forEach(ingredient => {
+
+            const item =
+                document.createElement("button");
+
+            item.type = "button";
+
+            item.className =
+                "ingredient-suggestion";
+
+            item.textContent =
+                ingredient.name;
+
+            item.addEventListener("click", () => {
+
+                input.value =
+                    ingredient.name;
+
+                updateIngredientDefaults();
+
+                suggestions.innerHTML = "";
+
+                suggestions.style.display = "none";
+
+                input.blur();
+
+            });
+
+            suggestions.appendChild(item);
+
+        });
+
+        suggestions.style.display = "block";
+    }
+
+    input.addEventListener(
+        "input",
+        showSuggestions
+    );
+
+    input.addEventListener(
+        "focus",
+        showSuggestions
+    );
+
+    document.addEventListener(
+        "click",
+        event => {
+
+            if (
+                !input.contains(event.target) &&
+                !suggestions.contains(event.target)
+            ) {
+
+                suggestions.style.display =
+                    "none";
+
+            }
+
+        }
+    );
 }
 function editIngredient(recipeIndex, ingredientIndex, fromEdit = false) {
 
