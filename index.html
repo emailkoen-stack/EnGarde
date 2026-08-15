@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="EnGarde">
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+
+    <title>EnGarde</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="app">
+
+        <header>
+            <h1>🍴 EnGarde</h1>
+        </header>
+
+        <main>
+
+            <section class="welcome">
+                <h2>Welkom!</h2>
+                <p>Wat gaan we vandaag koken?</p>
+            </section>
+
+            <section class="menu">
+
+                <button class="menu-item" onclick="openSection('recipes')">
+                    <span class="icon">🍝</span>
+                    <span>
+                        <strong>Recepten</strong>
+                        <small>Bekijk en beheer je recepten</small>
+                    </span>
+                    <span class="arrow">›</span>
+                </button>
+
+                <button class="menu-item" onclick="openSection('planner')">
+                    <span class="icon">📅</span>
+                    <span>
+                        <strong>Weekplanner</strong>
+                        <small>Plan je maaltijden</small>
+                    </span>
+                    <span class="arrow">›</span>
+                </button>
+
+                <button class="menu-item" onclick="openSection('shopping')">
+                    <span class="icon">🛒</span>
+                    <span>
+                        <strong>Boodschappenlijst</strong>
+                        <small>Automatisch samengesteld</small>
+                    </span>
+                    <span class="arrow">›</span>
+                </button>
+
+            </section>
+
+        </main>
+
+        <nav class="bottom-nav">
+
+            <button
+                data-section="recipes"
+                onclick="openSection('recipes')">
+                <span>🍝</span>
+                <small>Recepten</small>
+            </button>
+
+            <button
+                data-section="planner"
+                onclick="openSection('planner')">
+                <span>📅</span>
+                <small>Planner</small>
+            </button>
+
+            <button
+                data-section="shopping"
+                onclick="openSection('shopping')">
+                <span>🛒</span>
+                <small>Boodschappen</small>
+            </button>
+
+            <button
+                data-section="settings"
+                onclick="openSection('settings')">
+                <span>⚙️</span>
+                <small>Instellingen</small>
+            </button>
+
+        </nav>
+
+    </div>
+
+    <script src="ingredients.js"></script>
+    <script src="app.js"></script>
+
+</body>
+</html>
