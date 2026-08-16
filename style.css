@@ -1448,3 +1448,18 @@ button:active {
 .ingredient-suggestion:active {
     background: #eee;
 }
+.recipe-category {
+    margin-bottom: 24px;
+}
+
+.recipe-category-title {
+    margin: 18px 0 8px 4px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.recipe-category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}

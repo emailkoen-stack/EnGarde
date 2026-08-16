@@ -107,6 +107,7 @@ function saveMealPlan() {
 }
 /* ---------- 3. HELPERS ---------- */
 /* ----------    ├── getCategoryIcon() ---------- */
+/* ----------    ├── getMainIngredientIcon(ingredient) ---------- */
 /* ----------    ├── databaseCategories() ---------- */
 /* ----------    ├── databaseUnits() ---------- */
 /* ----------    ├── formatAmount() ---------- */
@@ -142,6 +143,26 @@ function getCategoryIcon(category) {
     };
 
     return icons[category] || "🛒";
+}
+function getMainIngredientIcon(ingredient) {
+
+    const icons = {
+
+        "Rund": "🥩",
+        "Varken": "🥩",
+        "Kip": "🍗",
+        "Vis": "🐟",
+        "Schaaldieren": "🦐",
+        "Vegetarisch": "🥬",
+        "Vegan": "🌱",
+        "Pasta": "🍝",
+        "Rijst": "🍚",
+        "Groenten": "🥦",
+        "Overig": "🍽️"
+
+    };
+
+    return icons[ingredient] || "🍽️";
 }
 function databaseCategories(selected = "") {
 
@@ -792,7 +813,9 @@ function filterRecipes() {
 }
 function renderRecipes(recipeList = recipes) {
 
-    const list = document.getElementById("recipe-list");
+    const list =
+        document.getElementById("recipe-list");
+
 
     if (recipeList.length === 0) {
 
@@ -814,61 +837,217 @@ function renderRecipes(recipeList = recipes) {
     }
 
 
-    list.innerHTML = recipeList.map(recipe => {
-
-        const index =
-            recipes.indexOf(recipe);
+    // Recepten groeperen volgens hoofdingrediënt
+    const groups = {};
 
 
-        return `
+    MAIN_INGREDIENTS.forEach(
+        ingredient => {
+            groups[ingredient] = [];
+        }
+    );
 
-            <button
-                class="recipe-card"
-                onclick="viewRecipe(${index})">
 
-                <div class="recipe-icon">
-                    🍽️
+    groups["Overig"] = [];
+
+
+    recipeList.forEach(recipe => {
+
+        const category =
+            recipe.mainIngredient;
+
+
+        if (
+            category &&
+            MAIN_INGREDIENTS.includes(category)
+        ) {
+
+            groups[category].push(recipe);
+
+        } else {
+
+            groups["Overig"].push(recipe);
+
+        }
+
+    });
+
+
+    let html = "";
+
+
+    // Categorieën weergeven in de volgorde
+    // van MAIN_INGREDIENTS
+    MAIN_INGREDIENTS.forEach(category => {
+
+        const group =
+            groups[category];
+
+
+        if (group.length === 0) {
+            return;
+        }
+
+
+        html += `
+
+            <div class="recipe-category">
+
+                <h3 class="recipe-category-title">
+                    ${getMainIngredientIcon(category)} ${category}
+                </h3>   
+
+                <div class="recipe-category-list">
+
+                    ${group.map(recipe => {
+
+                        const index =
+                            recipes.indexOf(recipe);
+
+
+                        return `
+
+                            <button
+                                class="recipe-card"
+                                onclick="viewRecipe(${index})">
+
+                                <div class="recipe-icon">
+                                    🍽️
+                                </div>
+
+
+                                <div class="recipe-info">
+
+                                    <strong>
+                                        ${recipe.name}
+                                    </strong>
+
+
+                                    <small>
+                                        ${recipe.type || "Hoofdgerecht"}
+
+                                        ${
+                                            recipe.cuisine
+                                            ? " · " + recipe.cuisine
+                                            : ""
+                                        }
+                                    </small>
+
+
+                                    <small>
+                                        👥 ${recipe.persons} personen
+
+                                        ${
+                                            recipe.favorite
+                                            ? " · ⭐"
+                                            : ""
+                                        }
+                                    </small>
+
+                                </div>
+
+
+                                <span class="arrow">
+                                    ›
+                                </span>
+
+                            </button>
+
+                        `;
+
+                    }).join("")}
+
                 </div>
 
-
-                <div class="recipe-info">
-
-                    <strong>
-                        ${recipe.name}
-                    </strong>
-
-
-                    <small>
-                        ${recipe.type || "Hoofdgerecht"}
-                        ${
-                            recipe.cuisine
-                            ? " · " + recipe.cuisine
-                            : ""
-                        }
-                    </small>
-
-
-                    <small>
-                        👥 ${recipe.persons} personen
-                        ${
-                            recipe.favorite
-                            ? " · ⭐"
-                            : ""
-                        }
-                    </small>
-
-                </div>
-
-
-                <span class="arrow">
-                    ›
-                </span>
-
-            </button>
+            </div>
 
         `;
 
-    }).join("");
+    });
+
+
+    // Recepten zonder hoofdingrediënt
+    // komen onderaan bij "Overig"
+    if (groups["Overig"].length > 0) {
+
+        html += `
+
+            <div class="recipe-category">
+
+                <h3 class="recipe-category-title">
+                    ${getMainIngredientIcon("Overig")} Overig
+                </h3>
+
+                <div class="recipe-category-list">
+
+                    ${groups["Overig"].map(recipe => {
+
+                        const index =
+                            recipes.indexOf(recipe);
+
+
+                        return `
+
+                            <button
+                                class="recipe-card"
+                                onclick="viewRecipe(${index})">
+
+                                <div class="recipe-icon">
+                                    🍽️
+                                </div>
+
+
+                                <div class="recipe-info">
+
+                                    <strong>
+                                        ${recipe.name}
+                                    </strong>
+
+
+                                    <small>
+                                        ${recipe.type || "Hoofdgerecht"}
+
+                                        ${
+                                            recipe.cuisine
+                                            ? " · " + recipe.cuisine
+                                            : ""
+                                        }
+                                    </small>
+
+
+                                    <small>
+                                        👥 ${recipe.persons} personen
+
+                                        ${
+                                            recipe.favorite
+                                            ? " · ⭐"
+                                            : ""
+                                        }
+                                    </small>
+
+                                </div>
+
+
+                                <span class="arrow">
+                                    ›
+                                </span>
+
+                            </button>
+
+                        `;
+
+                    }).join("")}
+
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+
+    list.innerHTML = html;
 }
 function newRecipe() {
 
@@ -1098,11 +1277,15 @@ function saveNewRecipe() {
     };
 
 
-    recipes.push(recipe);
+        recipes.push(recipe);
 
-    saveRecipes();
+        saveRecipes();
 
-    showRecipes();
+        const newRecipeIndex = recipes.length - 1;
+
+        editingRecipe = null;
+
+        editRecipe(newRecipeIndex);
 }
 function editRecipe(index) {
 
@@ -1543,7 +1726,7 @@ function viewRecipe(index) {
         <div class="recipe-detail">
 
             <div class="big-recipe-icon">
-                🍽️
+                ${getMainIngredientIcon(recipe.mainIngredient)}
             </div>
 
 
@@ -1583,7 +1766,7 @@ function viewRecipe(index) {
 
                 ${
                     recipe.mainIngredient
-                    ? `<span>🥩 ${recipe.mainIngredient}</span>`
+                    ? `<span>${getMainIngredientIcon(recipe.mainIngredient)} ${recipe.mainIngredient}</span>`
                     : ""
                 }
 
